@@ -154,6 +154,13 @@ class Neural(object):
                 dB[layer][node] = nodea*(1-nodea)*dC[layer][node]
         
         return (dW,dB)
+
+    def train(self, trainingData, batchSize, batches, printProgress = False):
+        #trainingData takes the form [(input,desiredOutput),(input,desiredOutput),...]
+        for batch in range(batches):
+            if printProgress print("Starting batch "+str(batch))
+            for run in batchSize:
+                pass
     
 if __name__ == "__main__":
     n = Neural(5,5,3,8,[x for x in range(5)])
