@@ -15,12 +15,20 @@ class Neural(object):
         assert(self.__numInputs == len(outputMap))
         self.__outputMap = outputMap
 
-    def emptyNodeList(self):
-        nlist = [[]]*self.__numLayers+2
+    def __emptyNodeList(self):
+        nlist = [[]]*(self.__numLayers+2)
         for layer in range(self.__numLayers+2):
-            numNodes = getNumNodesForLayer(layer)
+            numNodes = self.getNumNodesForLayer(layer)
             nlist[layer] = [0]*numNodes
         return nlist
+
+    def __emptyWeightList(self):
+        wlist = [[]]*(self.__numLayers+2)
+        for layer in range(1,self.__numLayers+2):
+            numLeftNodes = self.__numInputs if layer == 1 else self.__numNodes
+            numRightNodes = self.__numOutputs if layer == self.__numLayers+1 else self.__numNodes
+            wlist[layer] = [[0]*numLeftNodes]*numRightNodes
+        return wlist
     
     def initNodes(self):
         self.__nodes = []
@@ -44,7 +52,7 @@ class Neural(object):
         for layer in range(1,self.__numLayers+2):
             numLeftNodes = self.__numInputs if layer == 1 else self.__numNodes
             numRightNodes = self.__numOutputs if layer == self.__numLayers+1 else self.__numNodes
-            self.__weights[layer] = [[[]]*numLeftNodes]*numRightNodes
+            self.__weights[layer] = [[0]*numLeftNodes]*numRightNodes
             for r in range(numRightNodes):
                 for l in range(numLeftNodes):
                     self.__weights[layer][r][l] = random.randrange(-5,5)
@@ -115,8 +123,8 @@ class Neural(object):
         dC = self.__emptyNodeList()
         #calculate dC/da for output nodes
         for node in range(self.__numOutputs):
-            outL = self.__numNodes+1
-            dC[outL][node] = 2*(self.__nodes[outL][node]-desiredOut[node])
+            outL = self.__numLayers+1
+            dC[outL][node] = 2*(self.__nodes[outL][node]-desiredOutput[node])
 
         #calculate dC/da for all other nodes
         for layer in range(self.__numLayers,0,-1):
@@ -136,10 +144,16 @@ class Neural(object):
                 for lnode in range(self.getNumNodesForLayer(rlayer-1)):
                     rA = self.__nodes[rlayer][rnode]
                     lA = self.__nodes[rlayer-1][lnode]
-                    dW[rlayer][rnode][lnode] = lA*rA*(1-rA)*dC[rlayer][rnode]                   
+                    dW[rlayer][rnode][lnode] = lA*rA*(1-rA)*dC[rlayer][rnode]
 
+        #calculate dC/dB for all biases
+        dB = self.__emptyNodeList()
+        for layer in range(self.__numLayers,-1,-1):
+            for node in range(self.getNumNodesForLayer(layer)):
+                nodea = self.__nodes[layer][node]
+                dB[layer][node] = nodea*(1-nodea)*dC[layer][node]
         
-        assert("Finished" == False)
+        return (dW,dB)
     
 if __name__ == "__main__":
     n = Neural(5,5,3,8,[x for x in range(5)])
