@@ -19,6 +19,13 @@ def add3D(a,b):
     #needs more asserts
     return [[[a[x][y][z]+b[x][y][z] for z in range(len(a[x][y]))] for y in range(len(a[x]))] for x in range(len(a))]
 
+#takes a 3D matrix, a and multiplies every point by b
+def multiply3D(a,b):
+    return [[[a[x][y][z]*b for z in range(len(a[x][y]))] for y in range(len(a[x]))] for x in range(len(a))]
+
+def multiply2D(a,b):
+    return [[a[x][y]*b for y in range(len(a[x]))] for x in range(len(a))]
+
 if __name__ == "__main__":
     #unit testing / misc
     a = [4,6,3,1]
@@ -34,3 +41,12 @@ if __name__ == "__main__":
     b = [[[5,3,1],[9,0]],[[-5,2],[4,-5]]]
     c = [[[6,5,4],[12,4]],[[5,11],[12,2]]]
     assert(add3D(a,b)==c)
+
+    c = [[[2,4,6],[6,8]],[[20,18],[16,14]]]
+    assert(multiply3D(a,2) == c)
+
+    a = [[1,2,3],[4,5,6]]
+    c = [[3,6,9],[12,15,18]]
+    assert(multiply2D(a,3)==c)
+
+    print("Tests passed. Nothing's broken (That the tests know of)")
