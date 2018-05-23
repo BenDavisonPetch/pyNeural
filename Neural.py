@@ -124,18 +124,18 @@ class Neural(object):
         #calculate dC/da for output nodes
         for node in range(self.__numOutputs):
             outL = self.__numLayers+1
-            dC[outL][node] = 2*(self.__nodes[outL][node]-desiredOutput[node])
+            dC[outL][node] = float(2.0*(self.__nodes[outL][node]-desiredOutput[node]))
 
         #calculate dC/da for all other nodes
         for layer in range(self.__numLayers,0,-1):
             for node in range(self.__numNodes):
-                dsum = 0
+                dsum = 0.0
                 for j in range(self.getNumNodesForLayer(layer+1)):
-                    dz = self.__weights[layer+1][j][node]
-                    dsig = self.__nodes[layer+1][j]*(1-self.__nodes[layer+1][j])
-                    dCn = dC[layer+1][j]
-                    dsum += dz*dsig*dCn
-                dC[layer][node] = dsum
+                    dz = float(self.__weights[layer+1][j][node])
+                    dsig = float(self.__nodes[layer+1][j]*(1-self.__nodes[layer+1][j]))
+                    dCn = float(dC[layer+1][j])
+                    dsum += float(dz*dsig*dCn)
+                dC[layer][node] = float(dsum)
 
         #calculate dC/dW for all weights
         dW = self.__emptyWeightList()
@@ -144,11 +144,11 @@ class Neural(object):
                 for lnode in range(self.getNumNodesForLayer(rlayer-1)):
                     rA = self.__nodes[rlayer][rnode]
                     lA = self.__nodes[rlayer-1][lnode]
-                    dW[rlayer][rnode][lnode] = lA*rA*(1-rA)*dC[rlayer][rnode]
+                    dW[rlayer][rnode][lnode] = float(lA*rA*(1-rA)*dC[rlayer][rnode])
 
         #calculate dC/dB for all biases
         dB = self.__emptyNodeList()
-        for layer in range(self.__numLayers,-1,-1):
+        for layer in range(self.__numLayers+1,-1,-1):
             for node in range(self.getNumNodesForLayer(layer)):
                 nodea = self.__nodes[layer][node]
                 dB[layer][node] = nodea*(1-nodea)*dC[layer][node]
@@ -179,8 +179,8 @@ class Neural(object):
                         print("Current cost:")
                         print(self.cost(tdata[0],self.calc(tdata[0])))
                         
-            dW = netMath.multiply3D(dW, learningFactor/float(batchSize))
-            dB = netMath.multiply2D(dB, learningFactor/float(batchSize))
+            dW = netMath.multiply3D(dW, -learningFactor/float(batchSize))
+            dB = netMath.multiply2D(dB, -learningFactor/float(batchSize))
             self.__weights = netMath.add3D(self.__weights,dW)
             self.__biases = netMath.add2D(self.__biases,dB)
         if printProgressInterval:
@@ -194,7 +194,7 @@ class Neural(object):
     
 if __name__ == "__main__":
     #old tests
-    n = Neural(4,4,1,4,[1,2,3,4])
+    '''n = Neural(4,4,1,4,[1,2,3,4])
     data = []
     for i in range(500):
         inputMatrix = [random.random(),random.random(),random.random(),random.random()]
@@ -202,5 +202,5 @@ if __name__ == "__main__":
     print("Data's done")
     n.train(data,len(data),1000)
     print("\n===Test===\n\n")
-    print("[1,0,0,0]:",n.calc([1,0,0,0]))
+    print("[1,0,0,0]:",n.calc([1,0,0,0]))'''
                 
