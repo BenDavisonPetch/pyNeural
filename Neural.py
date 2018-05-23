@@ -157,13 +157,34 @@ class Neural(object):
 
     def train(self, trainingData, batchSize, batches, printProgress = False):
         #trainingData takes the form [(input,desiredOutput),(input,desiredOutput),...]
+        tindex = 0
         for batch in range(batches):
-            if printProgress print("Starting batch "+str(batch))
-            for run in batchSize:
-                pass
+            if printProgress:
+                print("\nStarting batch "+str(batch)+"\n")
+            dW = self.__emptyWeightList()
+            dB = self.__emptyNodeList()
+            for run in range(batchSize):
+                tdata = trainingData[tindex]
+                partial = self.backprop(tdata[0],tdata[1])
+                dW = netMath.add3D(dW,partial[0])
+                dB = netMath.add2D(dB,partial[1])
+                tindex = (tindex+1)%len(trainingData)
+            dW = netMath.multiply3D(dW, 1.0/float(batchSize))
+            dB = netMath.multiply2D(dB, 1.0/float(batchSize))
+            self.__weights = netMath.add3D(self.__weights,dW)
+            self.__biases = netMath.add2D(self.__biases,dB)
+            if printProgress:
+                print("Applied gradient")
+        if printProgress:
+            print("\n\nDone!")
     
 if __name__ == "__main__":
-    n = Neural(5,5,3,8,[x for x in range(5)])
-    out = n.backprop([0.4,0.1,0.3,0.8,1.0],[0,0,1,0,0])
-    print(out)
+    n = Neural(4,4,1,4,[1,2,3,4])
+    data = []
+    for i in range(100):
+        inputMatrix = [random.random(),random.random(),random.random(),random.random()]
+        data.append((inputMatrix,inputMatrix))
+    n.train(data,len(data),1000,True)
+    print("\n===Test===\n\n")
+    print("[1,0,0,0]:",n.calc([1,0,0,0]))
                 
