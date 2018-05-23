@@ -155,12 +155,17 @@ class Neural(object):
         
         return (dW,dB)
 
-    def train(self, trainingData, batchSize, batches, printProgress = False):
+    def cost(self, inputMatrix, desiredOutput):
+        assert(len(inputMatrix) == len(desiredOutput))
+        return sum([(inputMatrix[i]-desiredOutput[i])**2 for i in range(len(inputMatrix))])
+
+    def train(self, trainingData, batchSize, batches, learningFactor = 1.0, printProgressInterval = False):
         #trainingData takes the form [(input,desiredOutput),(input,desiredOutput),...]
         tindex = 0
         for batch in range(batches):
-            if printProgress:
-                print("\nStarting batch "+str(batch)+"\n")
+            if printProgressInterval:
+                if batch%printProgressInterval == 0:
+                    print("\nStarting batch "+str(batch)+"\n")
             dW = self.__emptyWeightList()
             dB = self.__emptyNodeList()
             for run in range(batchSize):
@@ -169,22 +174,33 @@ class Neural(object):
                 dW = netMath.add3D(dW,partial[0])
                 dB = netMath.add2D(dB,partial[1])
                 tindex = (tindex+1)%len(trainingData)
-            dW = netMath.multiply3D(dW, 1.0/float(batchSize))
-            dB = netMath.multiply2D(dB, 1.0/float(batchSize))
+                if printProgressInterval:
+                    if batch%printProgressInterval == 0 and run == 0:
+                        print("Current cost:")
+                        print(self.cost(tdata[0],self.calc(tdata[0])))
+                        
+            dW = netMath.multiply3D(dW, learningFactor/float(batchSize))
+            dB = netMath.multiply2D(dB, learningFactor/float(batchSize))
             self.__weights = netMath.add3D(self.__weights,dW)
             self.__biases = netMath.add2D(self.__biases,dB)
-            if printProgress:
-                print("Applied gradient")
-        if printProgress:
+        if printProgressInterval:
             print("\n\nDone!")
+
+    def getWeights(self):
+        return self.__weights
+
+    def getBiases(self):
+        return self.__biases
     
 if __name__ == "__main__":
+    #old tests
     n = Neural(4,4,1,4,[1,2,3,4])
     data = []
-    for i in range(100):
+    for i in range(500):
         inputMatrix = [random.random(),random.random(),random.random(),random.random()]
         data.append((inputMatrix,inputMatrix))
-    n.train(data,len(data),1000,True)
+    print("Data's done")
+    n.train(data,len(data),1000)
     print("\n===Test===\n\n")
     print("[1,0,0,0]:",n.calc([1,0,0,0]))
                 
