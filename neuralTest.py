@@ -27,14 +27,15 @@ n = Neural(4,4,2,8,[1,2,3,4])
 data = getDataFromFile("data.txt")
 print("Data loaded")
 
-n.train(data,100,1000,0.1, 50)
+n.train(data,200,10000,1, 50)
 print("\n===Test===\n\n")
 print("[1,0,0,0]:",n.calc([1,0,0,0]))
 print("[0,1,0,0]:",n.calc([0,1,0,0]))
 print("[1,1,0,0]:",n.calc([1,1,0,0]))
 print("[1,1,1,1]:",n.calc([1,1,1,1]))
 
+'''
 print("\n\n====Weights=====\n\n")
 print(n.getWeights())
 print("\n\n====Biases=====\n\n")
-print(n.getBiases())
+print(n.getBiases())'''

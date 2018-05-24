@@ -168,6 +168,7 @@ class Neural(object):
                     print("\nStarting batch "+str(batch)+"\n")
             dW = self.__emptyWeightList()
             dB = self.__emptyNodeList()
+            costTotal = 0
             for run in range(batchSize):
                 tdata = trainingData[tindex]
                 partial = self.backprop(tdata[0],tdata[1])
@@ -175,9 +176,10 @@ class Neural(object):
                 dB = netMath.add2D(dB,partial[1])
                 tindex = (tindex+1)%len(trainingData)
                 if printProgressInterval:
-                    if batch%printProgressInterval == 0 and run == 0:
+                    costTotal += self.cost(tdata[0],self.calc(tdata[0]))
+                    if batch%printProgressInterval == 0 and run == batchSize-1:
                         print("Current cost:")
-                        print(self.cost(tdata[0],self.calc(tdata[0])))
+                        print(costTotal/(run+1))
                         
             dW = netMath.multiply3D(dW, -learningFactor/float(batchSize))
             dB = netMath.multiply2D(dB, -learningFactor/float(batchSize))
